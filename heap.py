@@ -24,20 +24,14 @@ def HeapSort(arr):
 		(arr[i], arr[0]) = (arr[0], arr[i])
 		BuildHeap(arr, i, 0)
 
-def Show(arr):
-	for i in range(len(arr)):
-		print(arr[i], end=" ")
-	print()   
-
-
 if __name__ == '__main__':
     arr = []
     for i in range(100):
         arr.append(random.randint(-100000,100000))
     print("Lista dada:", end="\n")
-    Show(arr)
+    print(arr)
     HeapSort(arr)
     print("Lista ordenada ascendentemente: ", end="\n")
-    Show(arr)
+    print(arr)
     
 

@@ -27,17 +27,12 @@ def MergeSort(arr):
 			j += 1
 			k += 1
 
-def Show(arr):
-	for i in range(len(arr)):
-		print(arr[i], end=" ")
-	print()
-
 if __name__ == '__main__':
     arr = []
     for i in range(100):
         arr.append(random.randint(-100000,100000))
     print("Lista dada:", end="\n")
-    Show(arr)
+    print(arr)
     MergeSort(arr)
     print("Lista ordenada ascendentemente: ", end="\n")
-    Show(arr)
+    print(arr)
