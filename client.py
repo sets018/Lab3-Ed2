@@ -1,8 +1,20 @@
 import socket
 import pickle
+import threading
 import time
-#import numpy as np
+import struct
 
+def send_data(conn, data):
+    size = struct.pack('I', len(data))
+    conn.sendall(size)
+    conn.sendall(data)
+
+def recv_data(conn):
+    size_bytes = conn.recv(4)
+    size = struct.unpack('I', size_bytes)
+    size = size[0]
+    data = conn.recv(size)
+    return data
 
 class usr_input:
     def __init__(self, string, options_code):
@@ -31,7 +43,7 @@ class sorter:
         if (self.alg_op == "2"):
             sorted_arr = self.heapsort(self.arr)
         if (self.alg_op == "3"):
-            sorted_arr = self.quicksort(self.arr,  0, len(self.arr) - 1)
+            sorted_arr = self.quickSort(self.arr,  0, len(self.arr) - 1)
         return sorted_arr
     def rightPartition(self, array, low, high):
         pivot = array[high]
@@ -111,20 +123,30 @@ class sorter:
         # show time of execution per iteration
         print(f"Iteration: {j}\tTime taken: {(end - start) * 10 ** 3:.03f}ms")
 
+
 client = socket.socket()
 
 client.connect(('localhost', 1234))
 
+print("Connected to server")
+
+print("Welcome")
+
 name = input("Enter your name\n")
 
-client.sendall(bytes(name, 'utf-8'))
+name_coded = bytes(name, 'utf-8')
 
-print(client.recv(1024).decode())
+send_data(client, name_coded)
 
-arr_bytes = client.recv(4096)
-alg_op = client.recv(1024).decode()
+text = recv_data(client).decode()
 
-if (arr_bytes != None):
+print(text)
+
+arr_bytes = recv_data(client)
+
+alg_op = recv_data(client).decode('latin-1')
+
+if ((arr_bytes != None) and (alg_op != None)):
     print("array received from server")
     arr = pickle.loads(arr_bytes)
     #arr = np.frombuffer(arr_bytes, dtype = float)
@@ -133,5 +155,9 @@ if (arr_bytes != None):
     if (show_arr == "1"):
         print(*arr, sep=", ")
     sort_arr = sorter(arr, alg_op, client).sort()
+    if (sort_arr == None):
+        print("sorting in client failed")
     res_arr = pickle.dumps(sort_arr)
-    client.sendall(res_arr)
+    if (res_arr == None):
+        print("pickle in client failed")
+    send_data(client, res_arr)
