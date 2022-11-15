@@ -1,7 +1,21 @@
 import socket
-import numpy as np
 import random
 import pickle
+import threading
+import time
+import struct
+
+def send_data(conn, data):
+    size = struct.pack('I', len(data))
+    conn.sendall(size)
+    conn.sendall(data)
+
+def recv_data(conn):
+    size_bytes = conn.recv(4)
+    size = struct.unpack('I', size_bytes)
+    size = size[0]
+    data = conn.recv(size)
+    return data
 
 class usr_input:
     def __init__(self, string, options_code):
@@ -145,17 +159,21 @@ print('Waiting for connections')
 
 while True:
     client, addr = server.accept()
-    name = client.recv(1024).decode()
+    name = recv_data(client).decode()
     print("Established connection with ", addr, name)
-    client.sendall(bytes(f'Welcome the server has selected\nAlgorithm {alg_op}\nData source {data_op}', 'utf-8'))
-    client.sendall(arr)
-    client.sendall(bytes(name, 'utf-8'))
-    res_arr_bytes = client.recv(4096)
+    send_data(client, bytes(f'Welcome the server has selected\nAlgorithm {alg_op}\nData source {data_op}', 'utf-8'))
+    send_data(client, arr)
+    send_data(client, bytes(alg_op, 'latin-1'))
+    res_arr_bytes = recv_data(client)
+    if (res_arr_bytes == None):
+        print("sending sorted arr client to server failed")
     if (res_arr_bytes != None):
         print("sorted array received from server")
-        arr = pickle.loads(res_arr_bytes)
+        sorted_arr = pickle.loads(res_arr_bytes)
+        if (sorted_arr == None):
+            print("Unpickilng in server failed")
         # arr = np.frombuffer(arr_bytes, dtype = float)
-        show_arr = usr_input('Print the array received from the client\n1- Yes\n2- No ',
+        show_arr = usr_input('Print the sorted array received from the client\n1- Yes\n2- No ',
                              ["1", "2"], ).get_input_op()
         if (show_arr == "1"):
-            print(*arr, sep=", ")
+            print(*sorted_arr, sep=", ")
