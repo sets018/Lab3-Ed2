@@ -1,7 +1,9 @@
 import socket
 import pickle
 import threading
+from functools import wraps
 import time
+import math
 import struct
 
 def send_data(conn, data):
@@ -15,6 +17,23 @@ def recv_data(conn):
     size = size[0]
     data = conn.recv(size)
     return data
+
+def timeit(func):
+    cont = 0
+    @wraps(func)
+    def timeit_wrapper(*args, **kwargs):
+        nonlocal cont
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        cont = cont + 1		
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+        if cont % (round(math.log(n_arr))) == 0:
+            #print(f'Function {func.__name__} Iteration {cont} Took {total_time:.4f} seconds')
+            msg = f'Function {func.__name__} Iteration {cont} Took {total_time:.4f} seconds'
+            send_data(client,bytes(msg, 'utf-8'))
+        return result
+    return timeit_wrapper
 
 class usr_input:
     def __init__(self, string, options_code):
@@ -62,12 +81,17 @@ class sorter:
                 (array[i], array[pivot]) = (array[pivot], array[i])
         (array[pivot], array[low]) = (array[low], array[pivot])
         return pivot
+        
+    @timeit    
     def quickSort(self, array, low, high):
         if low < high:
             # Para seleccionar pivote inicial escoger entre left y right metodos
             pi = self.leftPartition(array, low, high)
             self.quickSort(array, low, pi - 1)
             self.quickSort(array, pi + 1, high)
+        return arr
+
+    @timeit    
     def heapsort(self,arr):
         n = len(arr)
         for i in range(n // 2 - 1, -1, -1):
@@ -75,6 +99,7 @@ class sorter:
         for i in range(n - 1, 0, -1):
             (arr[i], arr[0]) = (arr[0], arr[i])
             self.buildheap(arr, i, 0)
+        return arr
     def buildheap(self,arr, n, i):
         large = i
         left = 2 * i + 1
@@ -88,6 +113,8 @@ class sorter:
         if large != i:
             (arr[i], arr[large]) = (arr[large], arr[i])
             self.buildheap(arr, n, large)
+
+    @timeit        
     def mergesort(self, arr):
         if len(arr) > 1:
             mid = len(arr) // 2
@@ -114,6 +141,10 @@ class sorter:
                 k += 1
         return arr
 
+
+
+
+
 client = socket.socket()
 
 client.connect(('localhost', 1234))
@@ -139,12 +170,18 @@ alg_op = recv_data(client).decode('latin-1')
 if ((arr_bytes != None) and (alg_op != None)):
     print("array received from server")
     arr = pickle.loads(arr_bytes)
+    n_arr = len(arr)
     #arr = np.frombuffer(arr_bytes, dtype = float)
     show_arr = usr_input('Print the array received from the server\n1- Yes\n2- No ',
                        ["1", "2"], ).get_input_op()
     if (show_arr == "1"):
         print(*arr, sep=", ")
+    main_time = time.perf_counter()
+    send_data(client, bytes("start recv msg", 'utf-8'))
     sort_arr = sorter(arr, alg_op, client).sort()
+    ending_time = time.perf_counter()
+    print(f'Total sorting time: {ending_time - main_time}')
+    send_data(client, bytes("stop recv msg from client", 'utf-8'))
     if (sort_arr == None):
         print("sorting in client failed")
     res_arr = pickle.dumps(sort_arr)
