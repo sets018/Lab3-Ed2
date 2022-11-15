@@ -149,7 +149,7 @@ while True:
     print("Established connection with ", addr, name)
     client.sendall(bytes(f'Welcome the server has selected\nAlgorithm {alg_op}\nData source {data_op}', 'utf-8'))
     client.sendall(arr)
-    client.sendall(alg_op)
+    client.sendall(bytes(name, 'utf-8'))
     res_arr_bytes = client.recv(4096)
     if (res_arr_bytes != None):
         print("sorted array received from server")
