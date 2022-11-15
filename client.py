@@ -132,6 +132,6 @@ if (arr_bytes != None):
                        ["1", "2"], ).get_input_op()
     if (show_arr == "1"):
         print(*arr, sep=", ")
-    sort_arr = sorter(arr, alg_op).sort()
+    sort_arr = sorter(arr, alg_op, client).sort()
     res_arr = pickle.dumps(sort_arr)
     client.sendall(res_arr)
