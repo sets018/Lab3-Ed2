@@ -21,16 +21,68 @@ class usr_input:
 
 
 class data:
-    def __init__(self, source_type, data_source):
+    def __init__(self, source_type):
         self.source_type = source_type
-        self.data_source = data_source
     def get_data(self):
         if (self.source_type == "1"):
-            pass
+            arr = self.get_arr_file()
         if (self.source_type == "2"):
-            pass
+            arr = self.get_arr()
         if (self.source_type == "3"):
             arr = self.get_rand_arr_params()
+        return arr
+    def get_arr_file(self):
+        sw = 0
+        sw2 = 0
+        file_arr = []
+        while (sw2 == 0):
+            while (sw == 0):
+                file_path = input("Enter the file location\n")
+                file_sep = input("Enter the separator inside the file\n")
+                usr_file = self.read_file(file_path, file_sep)
+                if (usr_file != None):
+                    if (len(usr_file) >= 2):
+                        sw = 1
+                    else:
+                        print("Enter a valid file or separator\n")
+            for number in usr_file:
+                if (self.is_float(number)):
+                    file_arr.append(number)
+            if (file_arr != None):
+                if (len(file_arr) >= 2):
+                    sw2 = 1
+                else:
+                    sw = 0
+                    print("Enter a valid array or separator\n")
+        return file_arr
+    def read_file(self, file_path, file_sep):
+        with open(file_path, 'r') as file:
+            usr_file = file.read().replace('\n', '')
+            usr_file = usr_file.split(file_sep)
+        return usr_file
+    def get_arr(self):
+        sw = 0
+        sw2 = 0
+        arr = []
+        while (sw2 == 0):
+            while (sw == 0):
+                usr_arr = input("Enter the array\n")
+                sep = input("Enter the separator\n")
+                usr_arr = usr_arr.split(sep)
+                if (usr_arr != None):
+                    if (len(usr_arr) >= 2):
+                        sw = 1
+                    else:
+                        print("Enter a valid array or separator\n")
+            for number in usr_arr:
+                if (self.is_float(number)):
+                    arr.append(number)
+            if (arr != None):
+                if (len(arr) >= 2):
+                    sw2 = 1
+                else:
+                    sw = 0
+                    print("Enter a valid array or separator\n")
         return arr
     def get_rand_arr_params(self):
         n = self.get_input_params("Enter the number of elements in the array\n",1)
@@ -59,8 +111,14 @@ class data:
     def get_rand_arr(self, lower_limit, upper_limit, n):
         #return np.random.uniform(lower_limit, upper_limit, n)
         return [random.uniform(lower_limit,upper_limit) for _ in range(n)]
-    def is_number(self,number):
+    def is_number(self, number):
         return (number.replace('.', '', 1).isdigit() and number.replace('-', '', 1).isdigit())
+    def is_float(self, number):
+        try:
+            float(number)
+            return True
+        except:
+            return False
 
 
 # Crea el objeto socket del servidor tcp y ipv4 por default
@@ -77,14 +135,9 @@ alg_op = usr_input('Select an algorithm\n1- Mergesort\n2- Heapsort\n3- Quicksort
 
 data_op = usr_input('How do you want to input the data?\n1- Enter file location\n2- Enter string\n3- Create random array  ',
                     ["1", "2", "3"]).get_input_op()
-if (data_op == "1"):
-    pass
-if (data_op == "2"):
-    pass
-if (data_op == "3"):
-    usr_data = data("3","None").get_data()
-    arr = pickle.dumps(usr_data)
-    #print(type(usr_data))
+
+usr_data = data(data_op).get_data()
+arr = pickle.dumps(usr_data)
 
 # Determina el numero de conexiones
 server.listen()
@@ -96,4 +149,13 @@ while True:
     print("Established connection with ", addr, name)
     client.sendall(bytes(f'Welcome the server has selected\nAlgorithm {alg_op}\nData source {data_op}', 'utf-8'))
     client.sendall(arr)
-    client.close()
+    client.sendall(alg_op)
+    res_arr_bytes = client.recv(4096)
+    if (res_arr_bytes != None):
+        print("sorted array received from server")
+        arr = pickle.loads(res_arr_bytes)
+        # arr = np.frombuffer(arr_bytes, dtype = float)
+        show_arr = usr_input('Print the array received from the client\n1- Yes\n2- No ',
+                             ["1", "2"], ).get_input_op()
+        if (show_arr == "1"):
+            print(*arr, sep=", ")
