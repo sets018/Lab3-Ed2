@@ -122,7 +122,7 @@ client.sendall(bytes(name, 'utf-8'))
 print(client.recv(1024).decode())
 
 arr_bytes = client.recv(4096)
-alg_op = client.recv(4096).decode()
+alg_op = client.recv(1024).decode()
 
 if (arr_bytes != None):
     print("array received from server")
