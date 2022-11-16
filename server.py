@@ -193,6 +193,8 @@ while (sw == "1"):
         if (alg_op == "3"):
             send_data(client,bytes("1", 'utf-8'))
             send_data(client, bytes(pivot_op, 'latin-1'))
+        else:
+            send_data(client, bytes("0", 'utf-8'))
         sw2 = "1"
         while (sw2 == "1"):
             sw2 = recv_data(client).decode()
