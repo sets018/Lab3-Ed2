@@ -75,6 +75,7 @@ class data:
                         print("Enter a valid file or separator\n")
             for number in usr_file:
                 if (self.is_float(number)):
+                    number = float(number)
                     file_arr.append(number)
             if (file_arr != None):
                 if (len(file_arr) >= 2):
@@ -106,6 +107,7 @@ class data:
                         print("Enter a valid array or separator\n")
             for number in usr_arr:
                 if (self.is_float(number)):
+                    number = float(number)
                     arr.append(number)
             if (arr != None):
                 if (len(arr) >= 2):
