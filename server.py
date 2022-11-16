@@ -2,7 +2,6 @@ import socket
 import random
 import pickle
 import threading
-from functools import wraps
 import time
 import struct
 
@@ -165,18 +164,12 @@ while True:
     send_data(client, bytes(f'Welcome the server has selected\nAlgorithm {alg_op}\nData source {data_op}', 'utf-8'))
     send_data(client, arr)
     send_data(client, bytes(alg_op, 'latin-1'))
-    recv_msg = recv_data(client).decode()
-    if (recv_msg == "start recv msg from client"):
-        while (recv_msg == "start recv msg"):
-            msg = recv_data(client).decode()
     res_arr_bytes = recv_data(client)
     if (res_arr_bytes == None):
         print("sending sorted arr client to server failed")
     if (res_arr_bytes != None):
-        #print(res_arr_bytes.decode())
         print("sorted array received from server")
         sorted_arr = pickle.loads(res_arr_bytes)
-        #print(type(sorted_arr))
         if (sorted_arr == None):
             print("Unpickilng in server failed")
         # arr = np.frombuffer(arr_bytes, dtype = float)
