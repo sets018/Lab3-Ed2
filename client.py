@@ -142,45 +142,52 @@ class sorter:
 
 
 
+sw = "1"
+while (sw == "1"):
+    client = socket.socket()
 
-client = socket.socket()
+    client.connect(('localhost', 1234))
 
-client.connect(('localhost', 1234))
+    print("Connected to server")
 
-print("Connected to server")
+    print("Welcome")
 
-print("Welcome")
+    name = input("Enter your name\n")
 
-name = input("Enter your name\n")
+    name_coded = bytes(name, 'utf-8')
 
-name_coded = bytes(name, 'utf-8')
+    send_data(client, name_coded)
 
-send_data(client, name_coded)
+    text = recv_data(client).decode()
 
-text = recv_data(client).decode()
+    print(text)
 
-print(text)
+    arr_bytes = recv_data(client)
 
-arr_bytes = recv_data(client)
+    alg_op = recv_data(client).decode('latin-1')
 
-alg_op = recv_data(client).decode('latin-1')
+    if ((arr_bytes != None) and (alg_op != None)):
+        print("array received from server")
+        arr = pickle.loads(arr_bytes)
+        #arr = np.frombuffer(arr_bytes, dtype = float)
+        show_arr = usr_input('Print the array received from the server\n1- Yes\n2- No ',
+                           ["1", "2"], ).get_input_op()
+        if (show_arr == "1"):
+            print(*arr, sep=", ")
+        main_time = time.perf_counter()
+        sort_arr = sorter(arr, alg_op, client).sort()
+        ending_time = time.perf_counter()
+        print(f'Total sorting time: {ending_time - main_time}')
 
-if ((arr_bytes != None) and (alg_op != None)):
-    print("array received from server")
-    arr = pickle.loads(arr_bytes)
-    #arr = np.frombuffer(arr_bytes, dtype = float)
-    show_arr = usr_input('Print the array received from the server\n1- Yes\n2- No ',
+        if (sort_arr == None):
+            print("sorting in client failed")
+        res_arr = pickle.dumps(sort_arr)
+        if (res_arr == None):
+            print("pickle in client failed")
+        send_data(client, res_arr)
+        sw = usr_input('Do you want to receive more data from server? (keeps running the client)\n1- Yes\n2- No ',
                        ["1", "2"], ).get_input_op()
-    if (show_arr == "1"):
-        print(*arr, sep=", ")
-    main_time = time.perf_counter()
-    sort_arr = sorter(arr, alg_op, client).sort()
-    ending_time = time.perf_counter()
-    print(f'Total sorting time: {ending_time - main_time}')
-
-    if (sort_arr == None):
-        print("sorting in client failed")
-    res_arr = pickle.dumps(sort_arr)
-    if (res_arr == None):
-        print("pickle in client failed")
-    send_data(client, res_arr)
+    client.close()
+    if (sw == "2"):
+        print("Closing client")
+        client.close()
