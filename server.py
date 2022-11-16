@@ -197,4 +197,3 @@ while (sw == "1"):
                 break
             if (sw == "2"):
                 print("Closing server")
-                server.close()
