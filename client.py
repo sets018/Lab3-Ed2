@@ -157,12 +157,8 @@ class sorter:
 
 sw = "1"
 while (sw == "1"):
-    conn_op = usr_input('How do you want to connect?\n1- Locally ( Same machine runs client and server )\n2- Enter server Ip adress ( One machine runs server another runs client )',
-                       ["1", "2"], ).get_input_op()
-    if (conn_op == "1"):
-        adr = 'localhost'
-    if (conn_op == "2"):
-        adr = input("Enter the server ip address (IPv4-formatted)")
+
+    adr = input("Enter the server ip address (IPv4-formatted)")
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     client.connect((adr, 1234))
