@@ -166,7 +166,7 @@ while (sw == "1"):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print('Server socket created')
     print('Welcome to the server socket')
-
+    print ("Server ip adress ",adr_host)
     # Enlaza (bind) el socket con un port y la direccion del host
     #adr_host = adr
     port = 1234
