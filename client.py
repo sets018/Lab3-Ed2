@@ -158,14 +158,14 @@ class sorter:
 sw = "1"
 while (sw == "1"):
     client = socket.socket()
-    
-    adr = 'localhost'
-    
-    client.connect((adr, 1234))
+
+    client.connect(('localhost', 1234))
 
     print("Connected to server")
 
     print("Welcome")
+
+    sw_pivot = "0"
 
     name = input("Enter your name\n")
 
