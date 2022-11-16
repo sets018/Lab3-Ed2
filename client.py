@@ -158,8 +158,10 @@ class sorter:
 sw = "1"
 while (sw == "1"):
     client = socket.socket()
-
-    client.connect(('localhost', 1234))
+    
+    adr = 'localhost'
+    
+    client.connect((adr, 1234))
 
     print("Connected to server")
 
