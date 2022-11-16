@@ -28,8 +28,8 @@ def timeit(func):
         cont = cont + 1		
         end_time = time.perf_counter()
         total_time = end_time - start_time
-
-        print(f'Function {func.__name__} Iteration {cont} Took {total_time:.4f} seconds')
+        if cont % (round(math.log(n_arr))) == 0:
+            print(f'Function {func.__name__} Iteration {cont} Took {total_time:.4f} seconds')
         return result
     return timeit_wrapper
 
@@ -169,6 +169,7 @@ while (sw == "1"):
     if ((arr_bytes != None) and (alg_op != None)):
         print("array received from server")
         arr = pickle.loads(arr_bytes)
+        n_arr = len(arr)
         #arr = np.frombuffer(arr_bytes, dtype = float)
         show_arr = usr_input('Print the array received from the server\n1- Yes\n2- No ',
                            ["1", "2"], ).get_input_op()

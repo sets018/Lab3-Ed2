@@ -34,7 +34,6 @@ class usr_input:
                     print("Enter a valid option\n")
         return op
 
-
 class data:
     def __init__(self, source_type):
         self.source_type = source_type
@@ -51,8 +50,15 @@ class data:
         sw2 = 0
         file_arr = []
         while (sw2 == 0):
-            while (sw == 0):
-                file_path = input("Enter the file location\n")
+            while (sw == 0):      
+                while True:
+                    file_path = input("Enter the file location\n")
+                    try:
+                        usr_file = open(file_path, 'r').readlines()
+                    except (FileNotFoundError, IOError):
+                        print("Wrong file or file path")
+                    else: break
+
                 file_sep = input("Enter the separator inside the file\n")
                 usr_file = self.read_file(file_path, file_sep)
                 if (usr_file != None):
@@ -70,11 +76,13 @@ class data:
                     sw = 0
                     print("Enter a valid array or separator\n")
         return file_arr
+
     def read_file(self, file_path, file_sep):
         with open(file_path, 'r') as file:
             usr_file = file.read().replace('\n', '')
             usr_file = usr_file.split(file_sep)
         return usr_file
+
     def get_arr(self):
         sw = 0
         sw2 = 0
@@ -99,11 +107,13 @@ class data:
                     sw = 0
                     print("Enter a valid array or separator\n")
         return arr
+
     def get_rand_arr_params(self):
         n = self.get_input_params("Enter the number of elements in the array\n",1)
         lower_limit = self.get_input_params("Enter the lower limit of the interval\n", 0)
         upper_limit = self.get_input_params("Enter the upper limit of the interval\n", 0)
         return self.get_rand_arr(lower_limit, upper_limit, n)
+
     def get_input_params(self, inpt_string, cond_int):
         sw = 0
         while (sw == 0):
@@ -126,8 +136,10 @@ class data:
     def get_rand_arr(self, lower_limit, upper_limit, n):
         #return np.random.uniform(lower_limit, upper_limit, n)
         return [random.uniform(lower_limit,upper_limit) for _ in range(n)]
+
     def is_number(self, number):
         return (number.replace('.', '', 1).isdigit() and number.replace('-', '', 1).isdigit())
+        
     def is_float(self, number):
         try:
             float(number)
@@ -179,7 +191,7 @@ while (sw == "1"):
                                  ["1", "2"], ).get_input_op()
             if (show_arr == "1"):
                 print(*sorted_arr, sep=", ")
-                    sw = usr_input('Do you want to try another algorithm/data? (keeps running the server)\n1- Yes\n2- No ', ["1", "2"], ).get_input_op()
+                sw = usr_input('Do you want to try another algorithm/data? (keeps running the server)\n1- Yes\n2- No ', ["1", "2"], ).get_input_op()
             if (sw == "1"):
                 server.close()
                 break
