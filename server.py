@@ -157,24 +157,32 @@ arr = pickle.dumps(usr_data)
 # Determina el numero de conexiones
 server.listen()
 print('Waiting for connections')
-
-while True:
-    client, addr = server.accept()
-    name = recv_data(client).decode()
-    print("Established connection with ", addr, name)
-    send_data(client, bytes(f'Welcome the server has selected\nAlgorithm {alg_op}\nData source {data_op}', 'utf-8'))
-    send_data(client, arr)
-    send_data(client, bytes(alg_op, 'latin-1'))
-    res_arr_bytes = recv_data(client)
-    if (res_arr_bytes == None):
-        print("sending sorted arr client to server failed")
-    if (res_arr_bytes != None):
-        print("sorted array received from server")
-        sorted_arr = pickle.loads(res_arr_bytes)
-        if (sorted_arr == None):
-            print("Unpickilng in server failed")
-        # arr = np.frombuffer(arr_bytes, dtype = float)
-        show_arr = usr_input('Print the sorted array received from the client\n1- Yes\n2- No ',
-                             ["1", "2"], ).get_input_op()
-        if (show_arr == "1"):
-            print(*sorted_arr, sep=", ")
+sw = "1"
+while (sw == "1"):
+    while True:
+        client, addr = server.accept()
+        name = recv_data(client).decode()
+        print("Established connection with ", addr, name)
+        send_data(client, bytes(f'Welcome the server has selected\nAlgorithm {alg_op}\nData source {data_op}', 'utf-8'))
+        send_data(client, arr)
+        send_data(client, bytes(alg_op, 'latin-1'))
+        res_arr_bytes = recv_data(client)
+        if (res_arr_bytes == None):
+            print("sending sorted arr client to server failed")
+        if (res_arr_bytes != None):
+            print("sorted array received from server")
+            sorted_arr = pickle.loads(res_arr_bytes)
+            if (sorted_arr == None):
+                print("Unpickilng in server failed")
+            # arr = np.frombuffer(arr_bytes, dtype = float)
+            show_arr = usr_input('Print the sorted array received from the client\n1- Yes\n2- No ',
+                                 ["1", "2"], ).get_input_op()
+            if (show_arr == "1"):
+                print(*sorted_arr, sep=", ")
+                    sw = usr_input('Do you want to try another algorithm/data? (keeps running the server)\n1- Yes\n2- No ', ["1", "2"], ).get_input_op()
+            if (sw == "1"):
+                server.close()
+                break
+            if (sw == "2"):
+                print("Closing server")
+                server.close()
