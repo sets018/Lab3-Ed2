@@ -158,15 +158,17 @@ class data:
             return False
 
 
+host = socket.gethostname()
+adr_host = socket.gethostbyname(host)
 sw = "1"
 while (sw == "1"):
     # Crea el objeto socket del servidor tcp y ipv4 por default
-    server = socket.socket()
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print('Server socket created')
     print('Welcome to the server socket')
 
     # Enlaza (bind) el socket con un port y la direccion del host
-    adr_host = 'localhost'
+    #adr_host = adr
     port = 1234
     server.bind((adr_host, port))
 
