@@ -72,7 +72,7 @@ class sorter:
         if (self.alg_op == "2"):
             sorted_arr = self.heapsort(self.arr)
         if (self.alg_op == "3"):
-            sorted_arr = self.quickSort(self.arr, 0, len(self.arr) - 1)
+            sorted_arr = self.quickSort(self.arr, 0, len(self.arr) - 1,  self.op)
         return sorted_arr
 
     def rightPartition(self, array, low, high):
@@ -94,13 +94,71 @@ class sorter:
         (array[pivot], array[low]) = (array[low], array[pivot])
         return pivot
 
+    def midPartition(self, arr, low, high):
+        pivot = arr[(low + high) // 2]
+        i = low - 1
+        j = high + 1
+        while True:
+            i += 1
+            while arr[i] < pivot:
+                i += 1
+
+            j -= 1
+            while arr[j] > pivot:
+                j -= 1
+
+            if i >= j:
+                return j
+            arr[i], arr[j] = arr[j], arr[i]
+
+    def dualPartition(self, arr, low, high):
+        if arr[low] > arr[high]:
+            arr[low], arr[high] = arr[high], arr[low]
+            
+        j = k = low + 1
+        g, p, q = high - 1, arr[low], arr[high]
+        
+        while k <= g:
+            if arr[k] < p:
+                arr[k], arr[j] = arr[j], arr[k]
+                j += 1
+
+            elif arr[k] >= q:
+                while arr[g] > q and k < g:
+                    g -= 1	
+                arr[k], arr[g] = arr[g], arr[k]
+                g -= 1
+
+                if arr[k] < p:
+                    arr[k], arr[j] = arr[j], arr[k]
+                    j += 1				
+            k += 1	
+        j -= 1
+        g += 1
+        arr[low], arr[j] = arr[j], arr[low]
+        arr[high], arr[g] = arr[g], arr[high]
+        return j, g
+    #Se me habia olvidado pasar los otros pivotes de quick al client
     @timeit
-    def quickSort(self, array, low, high):
+    def quickSort(self, array, low, high,op):
         if low < high:
-            # Para seleccionar pivote inicial escoger entre left y right metodos
-            pi = self.leftPartition(array, low, high)
-            self.quickSort(array, low, pi - 1)
-            self.quickSort(array, pi + 1, high)
+            if(op=="1"):
+                pi = self.leftPartition(array, low, high)
+                self.quickSort(array, low, pi - 1, op)
+                self.quickSort(array, pi + 1, high, op)           
+            if(op=="2"):
+                pi = self.rightPartition(array, low, high)
+                self.quickSort(array, low, pi - 1, op)
+                self.quickSort(array, pi + 1, high, op)
+            if(op=="3"):
+                pi = self.midPartition(array, low, high) 
+                self.quickSort(array, low, pi, op)
+                self.quickSort(array, pi + 1, high, op)
+            if(op=="4"):
+                lp, rp = self.dualPartition(arr, low, high)
+                self.quickSort(arr, low, lp - 1,op)
+                self.quickSort(arr, lp + 1, rp - 1,op)
+                self.quickSort(arr, rp + 1, high,op)
         return arr
 
     @timeit
